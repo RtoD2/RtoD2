@@ -119,6 +119,11 @@
 <% end %>
 <br />
 <br />
+
+<% if @game.active_player_id == current_user.id %>
+	<button class="btn btn-danger" id="forfeit-game">Forfeit Game</button>
+<% end %>
+
 <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
 <script>
   var config = {
@@ -318,6 +323,29 @@
 			})
 			.fail(function(xhr, textStatus, errorThrown) {
 				console.log('failed to join!');
+				console.log(xhr.statusText);
+				console.log(textStatus);
+				console.log(errorThrown);
+			});
+	}
+
+	$('#forfeit-game').on('click', function() {
+		forfeitGame(<%=@game.id %>);
+	})
+
+	function forfeitGame(gameId) {
+		var forfeitUrl = "/games/" + <%=@game.id %> + "/forfeit";
+		var data = {_method: 'PATCH'};
+		$.post(forfeitUrl, data)
+			.done(function(data){
+				console.log('forfeited game!');
+				console.log(data);
+				gameRef.update({
+					game_status: 'finished'
+				});
+			})
+			.fail(function(xhr, testStatus, errorThrown) {
+				console.log('failed to forfeit');
 				console.log(xhr.statusText);
 				console.log(textStatus);
 				console.log(errorThrown);
